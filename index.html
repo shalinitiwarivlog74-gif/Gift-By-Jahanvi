@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family & Friends Valentine Adventure 💜</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Handlee&display=swap');
+        :root { --lavender-main: #e1bee7; --deep-purple: #7e57c2; --soft-purple: #9575cd; --lavender-light: #f3e5f5; --mint-green: #b2fab4; }
+        body { margin: 0; padding: 0; font-family: 'Handlee', cursive; background: linear-gradient(135deg, #f8f0fb, var(--lavender-main)); overflow: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; touch-action: none; }
+        .screen { display: none; text-align: center; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); padding: 25px; border-radius: 30px; box-shadow: 0 15px 35px rgba(126, 87, 194, 0.2); width: 90%; max-width: 400px; border: 2px solid rgba(255, 255, 255, 0.5); position: relative; z-index: 10; }
+        .active { display: block; animation: fadeIn 0.5s ease; }
+        .panda-gif { width: 140px; height: 140px; object-fit: contain; margin-bottom: 15px; border-radius: 15px; }
+        h1 { font-family: 'Fredoka', sans-serif; color: var(--deep-purple); font-size: 1.5rem; }
+        p { color: var(--soft-purple); font-weight: 600; font-size: 0.95rem; }
+        .btn { padding: 10px 20px; font-size: 1rem; border: none; border-radius: 15px; cursor: pointer; transition: 0.3s; font-family: 'Fredoka', sans-serif; margin: 8px; }
+        #yesBtn { background: var(--mint-green); color: #2e7d32; font-weight: bold; transition: transform 0.2s; }
+        #noBtn { background: rgba(238, 238, 238, 0.8); color: #888; transition: 0.2s; }
+        .stars-container { margin: 15px 0; font-size: 2.2rem; }
+        .star { cursor: pointer; color: #ccc; transition: 0.2s; display: inline-block; }
+        .star.selected { color: #ffca28; transform: scale(1.2); }
+        .footer-credit { position: fixed; bottom: 15px; font-size: 0.85rem; color: var(--deep-purple); font-weight: bold; z-index: 100; text-align: center; width: 100%; }
+        input, textarea { width: 90%; border-radius: 10px; border: 2px solid var(--soft-purple); padding: 10px; margin-top: 10px; background: rgba(243, 229, 245, 0.8); font-family: inherit; }
+        .game-area { height: 180px; position: relative; overflow: hidden; background: rgba(255, 249, 255, 0.5); border-radius: 15px; border: 2px dashed var(--soft-purple); }
+        .heart-game-item { position: absolute; cursor: pointer; font-size: 2rem; user-select: none; }
+        .ttt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 15px auto; max-width: 180px; }
+        .ttt-cell { width: 55px; height: 55px; background: white; border: 2px solid var(--soft-purple); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; cursor: pointer; }
+        .decor { position: fixed; pointer-events: none; z-index: 1; animation: floatUp 5s infinite linear; }
+        
+        /* Valentine Rain Effect */
+        .val-rain { position: fixed; pointer-events: none; color: #ff4d4d; font-weight: bold; font-size: 1.2rem; z-index: 100; animation: rainDown 4s linear forwards; }
+
+        @keyframes rainDown { from { transform: translateY(-10vh); opacity: 1; } to { transform: translateY(110vh); opacity: 0; } }
+        @keyframes floatUp { from { transform: translateY(110vh); opacity: 1; } to { transform: translateY(-10vh); opacity: 0; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+<audio id="bgMusic" loop><source src="audio 1.mp3" type="audio/mpeg"></audio>
+
+<div class="screen active" id="screen0">
+    <audio id="bgMusic" loop><source src="audio 1.mp3" type="audio/mpeg"></audio>
+    <img src="https://media.tenor.com/vroVodINV0EAAAAi/tkthao219-bubududu.gif" class="panda-gif">
+    <h1>A special gift for you! 🎁</h1>
+    <p>If you want to open this gift, enter your name:</p>
+    <input type="text" id="initialName" placeholder="Your name..." required>
+    <br><button class="btn" id="yesBtn" onclick="startGift()">Open Gift ✨</button>
+</div>
+
+<div class="screen" id="screen1">
+    <img src="https://media.tenor.com/RpmAtRQfncMAAAAi/bubududu-panda.gif" id="panda1" class="panda-gif">
+    <h1 id="welcomeText">Can I get a group hug? 🤗</h1>
+    <div style="height: 100px; position: relative;">
+        <button class="btn" id="yesBtn" onclick="playPop(); nextScreen(2)">YES! ❤️</button>
+        <button class="btn" id="noBtn" onmouseover="handleNo()" onclick="handleNo()">No</button>
+    </div>
+</div>
+
+<div class="screen" id="screen2">
+    <img src="https://media.tenor.com/4bV9ylEOWpgAAAAj/bubu-dudu-sseeyall.gif" class="panda-gif">
+    <h1>You all are my world! 🌍</h1>
+    <p>Every moment with family & friends is a gift. ✨</p>
+    <button class="btn" id="yesBtn" onclick="playPop(); nextScreen(3)">Next 😊</button>
+</div>
+
+<div class="screen" id="screen3">
+    <h1>Relatable? 🤣</h1>
+    <div style="width: 100%; height: 250px; background: #000; border-radius: 20px; overflow: hidden; margin-bottom: 20px; border: 3px solid var(--soft-purple);">
+        <video id="funnyVideo" width="100%" height="100%" loop playsinline style="object-fit: cover;"><source src="vedio 2.mp4" type="video/mp4"></video>
+    </div>
+    <button class="btn" id="yesBtn" onclick="playPop(); trackAction('Enjoyed Video'); nextScreen(4)">Enjoyed it! 😂</button>
+    <button class="btn" style="background: #eee;" onclick="playPop(); trackAction('Not Really Enjoyed'); nextScreen(4)">Not really 🙄</button>
+</div>
+
+<div class="screen" id="screen4">
+    <img src="https://media.tenor.com/KNiXTCA36YYAAAAi/bubu-dudu-sseeyall.gif" class="panda-gif">
+    <h1>Thank you for everything! 🌸</h1>
+    <p>I'm so lucky to have the best people in my life.</p>
+    <button class="btn" id="yesBtn" onclick="playPop(); nextScreen(5)">One Last Thing... 🎮</button>
+</div>
+
+<div class="screen" id="screen5">
+    <h1>Find the Red Heart! ❤️</h1>
+    <p>You have to find the red heart to proceed further 😊</p>
+    <div class="game-area" id="gameCanvas"></div>
+    <p id="gameFeedback" style="min-height: 20px;"></p>
+</div>
+
+<div class="screen" id="screen6">
+    <img src="https://media1.tenor.com/m/xHUZHXx5Q2YAAAAd/panda-write.gif" class="panda-gif">
+    <h1>Write to Me! ✍️</h1>
+    <form id="msgForm">
+        <textarea name="message" id="msgInput" placeholder="Write message..." required></textarea>
+        <br><button type="submit" class="btn" id="yesBtn">Send Message ❤️</button>
+    </form>
+    <p id="formStatus"></p>
+</div>
+
+<div class="screen" id="screen_choice">
+    <img src="https://media.tenor.com/DgD9C9MGlsQAAAAi/peachugomu-gif.gif" class="panda-gif">
+    <h1>Wait! One more thing... 🎮</h1>
+    <p>Do you want to play a game with me?</p>
+    <button class="btn" id="yesBtn" onclick="trackAction('Chose to Play'); nextScreen('ttt')">YES! 😍</button>
+    <button class="btn" id="noBtn" onclick="trackAction('Skipped Game'); nextScreen('rate')">No, skip 🏃‍♂️</button>
+</div>
+
+<div class="screen" id="screen_ttt">
+    <h1>Tic-Tac-Toe! 🏆</h1>
+    <p id="tttStatus">Beat me! ❤️ vs ✨</p>
+    <div class="ttt-grid" id="tttGrid">
+        <div class="ttt-cell" onclick="makeMove(0)"></div><div class="ttt-cell" onclick="makeMove(1)"></div><div class="ttt-cell" onclick="makeMove(2)"></div>
+        <div class="ttt-cell" onclick="makeMove(3)"></div><div class="ttt-cell" onclick="makeMove(4)"></div><div class="ttt-cell" onclick="makeMove(5)"></div>
+        <div class="ttt-cell" onclick="makeMove(6)"></div><div class="ttt-cell" onclick="makeMove(7)"></div><div class="ttt-cell" onclick="makeMove(8)"></div>
+    </div>
+    <button class="btn" id="tttNextBtn" style="display:none;" onclick="nextScreen('rate')">Continue ✨</button>
+</div>
+
+<div class="screen" id="screen_rate">
+    <h1>Rate Jahanvi's Hard Work! ⭐</h1>
+    <p>How much did you like this gift?</p>
+    <div class="stars-container" id="stars">
+        <span class="star" onclick="setRating(1)">⭐</span><span class="star" onclick="setRating(2)">⭐</span><span class="star" onclick="setRating(3)">⭐</span><span class="star" onclick="setRating(4)">⭐</span><span class="star" onclick="setRating(5)">⭐</span>
+    </div>
+    <p id="rateStatus" style="font-weight: bold; color: var(--deep-purple);">Tap to rate!</p>
+    <button class="btn" id="yesBtn" onclick="nextScreen(7)">Finish Adventure ❤️</button>
+</div>
+
+<div class="screen" id="screen7">
+    <img src="https://media.tenor.com/Pnxv-9Bp0DUAAAAi/tkthao219-bubududu.gif" class="panda-gif">
+    <h1>Bye Family & Friends! 👋</h1>
+    <p>See you soon... ❤️</p>
+    <div id="messageDisplay" style="background: rgba(126, 87, 194, 0.1); border-radius: 15px; padding: 15px; margin: 10px 0; border: 1px solid var(--soft-purple);">
+        <p id="finalMsgText" style="font-style: italic; color: var(--deep-purple);"></p>
+    </div>
+    <button class="btn" style="background: #ddd;" onclick="location.reload()">Back to Start</button>
+</div>
+
+<div class="footer-credit" ><h1>Made by glow_with_sisters</h1></div>
+
+<script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzRsLAkskEG3cCq-Ts_YqIWOicfOVPf7yYlwPLkfyVPenR8ePNOzUzjdUxzZiYLl6b5vw/exec'; 
+    let noCount=0; let yesScale=1; let startTime=Date.now(); let userName=""; let userRating=0;
+    const music=document.getElementById('bgMusic'); const video=document.getElementById('funnyVideo');
+    let board=["","","","","","","","",""]; let gameActive=true;
+
+    // Fix 1: Start Music from the first page button
+    function startGift(){ 
+        const i=document.getElementById('initialName'); 
+        if(i.value.trim()===""){alert("Name please! ❤️");return;} 
+        userName=i.value; 
+        music.play().catch(() => {}); // Music starts here
+        trackAction('Opened App'); 
+        nextScreen(1); 
+    }
+
+    function getSimpleDevice(){ const ua=navigator.userAgent; if(/android/i.test(ua))return "Android"; if(/iPhone|iPad|iPod/i.test(ua))return "iPhone"; return "PC"; }
+    function trackAction(a){ const fd=new FormData(); fd.append('User_Name',userName); fd.append('Action',a); fd.append('Device_Info',getSimpleDevice()); fetch(scriptURL,{method:'POST',body:fd}); }
+
+    // Fix 2: Better No button logic with text change and movement
+    function handleNo(){ 
+        noCount++; 
+        trackAction('Tried No'); 
+        const noBtn=document.getElementById('noBtn'); 
+        const yesBtn=document.getElementById('yesBtn');
+        
+        const texts = ["No", "Are you sure?", "Really?", "Don't do this!", "Pleease?", "You can't click this!"];
+        noBtn.innerText = texts[Math.min(noCount, texts.length - 1)];
+
+        // Move the button randomly
+        const x = Math.random() * (window.innerWidth - 150);
+        const y = Math.random() * (window.innerHeight - 100);
+        noBtn.style.position = 'fixed';
+        noBtn.style.left = x + 'px';
+        noBtn.style.top = y + 'px';
+
+        // Increase Yes button size
+        yesScale += 0.2;
+        yesBtn.style.transform = `scale(${yesScale})`;
+    }
+
+    function nextScreen(n){ 
+        if(n===3){music.pause(); video.play();} else{if(n!==0)music.play().catch(()=>{}); video.pause();}
+        document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+        const t=(n==='ttt')?'screen_ttt':(n==='choice')?'screen_choice':(n==='rate')?'screen_rate':'screen'+n;
+        document.getElementById(t).classList.add('active');
+        if(n===5)startHeartGame();
+        if(n===7)startValRain(); // Fix 3: Trigger Rain on last screen
+    }
+
+    // Fix 3: Happy Valentine's Day Rain Logic
+    function startValRain() {
+        setInterval(() => {
+            const rain = document.createElement('div');
+            rain.className = 'val-rain';
+            const texts = ["Happy Valentine's Day", "❤️", "💖", "I Love You", "✨"];
+            rain.innerText = texts[Math.floor(Math.random() * texts.length)];
+            rain.style.left = Math.random() * 100 + 'vw';
+            rain.style.fontSize = (Math.random() * 1.5 + 0.5) + 'rem';
+            document.body.appendChild(rain);
+            setTimeout(() => rain.remove(), 4000);
+        }, 300);
+    }
+
+    function startHeartGame(){ const c=document.getElementById('gameCanvas'); c.innerHTML=''; const h=['💜','💙','💚','💛','🧡','🤍','💖','✨','🌸'];
+        for(let i=0;i<12;i++){ const s=document.createElement('span'); s.innerHTML=h[Math.floor(Math.random()*h.length)]; s.className='heart-game-item'; s.style.left=Math.random()*85+'%'; s.style.top=Math.random()*75+'%'; s.onclick=()=>document.getElementById('gameFeedback').innerText="Not red! ❌"; c.appendChild(s); }
+        const r=document.createElement('span'); r.innerHTML='❤️'; r.className='heart-game-item'; r.style.left=Math.random()*85+'%'; r.style.top=Math.random()*75+'%'; r.onclick=()=>{trackAction('Found Heart'); confetti(); nextScreen(6);}; c.appendChild(r); }
+
+    function makeMove(i){ if(board[i]==="" && gameActive){ board[i]="❤️"; document.querySelectorAll('.ttt-cell')[i].innerText="❤️"; if(checkWin("❤️")){endGame("You won! 🌟");return;} if(!board.includes("")){endGame("Tie! 🤝");return;} gameActive=false; setTimeout(cpuMove,600); } }
+    function cpuMove(){ let e=board.map((v,idx)=>v===""?idx:null).filter(v=>v!==null); let m=e[Math.floor(Math.random()*e.length)]; board[m]="✨"; document.querySelectorAll('.ttt-cell')[m].innerText="✨"; if(checkWin("✨")){endGame("I won! 😜");} else if(!board.includes("")){endGame("Tie! 🤝");} else gameActive=true; }
+    function checkWin(p){ const w=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]; return w.some(m=>m.every(idx=>board[idx]===p)); }
+    function endGame(m){ document.getElementById('tttStatus').innerText=m; gameActive=false; document.getElementById('tttNextBtn').style.display="inline-block"; if(m.includes("won"))confetti(); trackAction('Game: '+m); }
+
+    function setRating(n){ 
+        userRating=n; 
+        const s=document.querySelectorAll('.star'); 
+        const status = document.getElementById('rateStatus');
+        s.forEach((el,idx)=>{
+            if(idx<n) el.classList.add('selected');
+            else el.classList.remove('selected');
+        }); 
+        if(n <= 2) { status.innerText = "I'll do better next time! 🥺"; } 
+        else if (n === 3 || n === 4) { status.innerText = "Glad you liked it! 😊"; } 
+        else { status.innerText = "Yay! Love you too! ❤️"; confetti(); }
+        trackAction('Rated: '+n); 
+    }
+
+    document.getElementById("msgForm").onsubmit=(e)=>{ e.preventDefault(); document.getElementById("formStatus").innerText="Saving... ❤️"; const fd=new FormData(); fd.append('User_Name',userName); fd.append('message',document.getElementById("msgInput").value); fd.append('Action','Sent Message'); fetch(scriptURL,{method:'POST',body:fd}).then(()=>{document.getElementById("finalMsgText").innerText=document.getElementById("msgInput").value; confetti(); setTimeout(()=>nextScreen('choice'),1500);}); };
+    function playPop(){ music.play().catch(()=>{}); }
+    
+    // Ambient decor rain
+    setInterval(()=>{ const d=document.createElement('div'); d.className='decor'; d.innerHTML='💜'; d.style.left=Math.random()*100+'vw'; document.body.appendChild(d); setTimeout(()=>d.remove(),5000); },1000);
+</script>
+</body>
+</html>
